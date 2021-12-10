@@ -1,3 +1,3 @@
 #  prometheus.clj
 
-Pure clojure prometheus client library
+Pure clojure, zero-deps prometheus client library

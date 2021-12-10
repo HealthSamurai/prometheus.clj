@@ -4,56 +4,48 @@
 (defn new-registry []
   (agent {}))
 
-
-(defn send-ztx [ztx & params]
-  (apply send (:metrics @ztx) params))
-
 (defn set-counter
-  ([ztx metric labels v]
-   (send-ztx ztx assoc-in [:counter metric labels] v))
-  ([ztx ns metric labels v]
-   (send-ztx ztx assoc-in [ns :counter metric labels] v)))
+  ([reg metric labels v]
+   (send reg assoc-in [:counter metric labels] v))
+  ([reg ns metric labels v]
+   (send reg assoc-in [ns :counter metric labels] v)))
 
 (defn counter
-  ([ztx metric labels]
-   (send-ztx ztx update-in [:counter metric labels] (fn [x] (inc (or x 0)))))
-  ([ztx ns metric labels]
-   (send-ztx ztx update-in [ns :counter metric labels] (fn [x] (inc (or x 0))))))
+  ([reg metric labels]
+   (send reg update-in [:counter metric labels] (fn [x] (inc (or x 0)))))
+  ([reg ns metric labels]
+   (send reg update-in [ns :counter metric labels] (fn [x] (inc (or x 0))))))
 
 (defn counter-add
-  ([ztx metric labels inc]
-   (send-ztx ztx update-in [:counter metric labels] (fn [x] (+ (or x 0) inc))))
-  ([ztx ns metric labels inc]
-   (send-ztx ztx update-in [ns :counter metric labels] (fn [x] (+ (or x 0) inc)))))
+  ([reg metric labels inc]
+   (send reg update-in [:counter metric labels] (fn [x] (+ (or x 0) inc))))
+  ([reg ns metric labels inc]
+   (send reg update-in [ns :counter metric labels] (fn [x] (+ (or x 0) inc)))))
 
 (defn gauge
-  ([ztx metric labels v]
-   (send-ztx ztx assoc-in [:gauge metric labels] v))
-  ([ztx ns metric labels v]
-   (send-ztx ztx assoc-in [ns :gauge metric labels] v)))
+  ([reg metric labels v]
+   (send reg assoc-in [:gauge metric labels] v))
+  ([reg ns metric labels v]
+   (send reg assoc-in [ns :gauge metric labels] v)))
 
 (defn get-metric
-  ([ztx metric]
-   (let [reg (:metrics @ztx)]
-     (or
-      (get-in @reg [:counter metric])
-      (get-in @reg [:gauge metric])
-      (get-in @reg [:histogram metric]))))
-  ([ztx metric labels]
-   (let [reg (:metrics @ztx)]
-     (or
-      (get-in @reg [:counter metric labels])
-      (get-in @reg [:gauge metric labels])
-      (get-in @reg [:histogram metric labels])))))
+  ([reg metric]
+   (or
+    (get-in @reg [:counter metric])
+    (get-in @reg [:gauge metric])
+    (get-in @reg [:histogram metric])))
+  ([reg metric labels]
+   (or
+    (get-in @reg [:counter metric labels])
+    (get-in @reg [:gauge metric labels])
+    (get-in @reg [:histogram metric labels]))))
 
-(defn register-metric-meta [ztx metric meta-name value]
-  (let [reg (:metrics @ztx)]
-    (when-not (get-in @reg [:meta metric meta-name])
-      (send reg assoc-in [:meta metric meta-name] value))))
-
-(defn register-metric-meta! [ztx metric meta-name value]
-  (let [reg (:metrics @ztx)]
+(defn register-metric-meta [reg metric meta-name value]
+  (when-not (get-in @reg [:meta metric meta-name])
     (send reg assoc-in [:meta metric meta-name] value)))
+
+(defn register-metric-meta! [reg metric meta-name value]
+  (send reg assoc-in [:meta metric meta-name] value))
 
 (def default-buckets [0.005 0.01 0.025 0.05 0.1 0.25 0.5 1.0 2.5 5.0 10])
 
@@ -67,26 +59,24 @@
         (recur rst)))))
 
 (defn histogram
-  ([ztx metric labels val]
-   (when-let  [reg (some-> ztx deref :metrics)]
-     (let [buckets (or (get-in @reg [:meta metric :buckets]) default-buckets)
-           bnd (find-bound buckets val)]
-       (send reg (fn [reg]
-                   (-> reg
-                       (cond-> bnd (update-in [:histogram metric labels :le bnd] (fn [x] (inc (or x 0)))))
-                       (update-in [:histogram metric labels :count] (fn [x] (inc (or x 0))))
-                       (update-in [:histogram metric labels :sum] (fn [x] (+ (or x 0) val)))))))))
-  ([ztx ns metric labels val]
-   (when-let  [reg (:metrics @ztx)]
-     (let [buckets (or (get-in @reg [:meta metric :buckets]) default-buckets)
-           bnd (find-bound buckets val)]
-       (send reg (fn [reg]
-                   (-> reg
-                       (cond-> bnd (update-in [ns :histogram metric labels :le bnd] (fn [x] (inc (or x 0)))))
-                       (update-in [ns :histogram metric labels :count] (fn [x] (inc (or x 0))))
-                       (update-in [ns :histogram metric labels :sum] (fn [x] (+ (or x 0) val))))))))))
+  ([reg metric labels val]
+   (let [buckets (or (get-in @reg [:meta metric :buckets]) default-buckets)
+         bnd (find-bound buckets val)]
+     (send reg (fn [reg]
+                 (-> reg
+                     (cond-> bnd (update-in [:histogram metric labels :le bnd] (fn [x] (inc (or x 0)))))
+                     (update-in [:histogram metric labels :count] (fn [x] (inc (or x 0))))
+                     (update-in [:histogram metric labels :sum] (fn [x] (+ (or x 0) val))))))))
+  ([reg ns metric labels val]
+   (let [buckets (or (get-in @reg [:meta metric :buckets]) default-buckets)
+         bnd (find-bound buckets val)]
+     (send reg (fn [reg]
+                 (-> reg
+                     (cond-> bnd (update-in [ns :histogram metric labels :le bnd] (fn [x] (inc (or x 0)))))
+                     (update-in [ns :histogram metric labels :count] (fn [x] (inc (or x 0))))
+                     (update-in [ns :histogram metric labels :sum] (fn [x] (+ (or x 0) val)))))))))
 
-(defn summary [ztx metric labels val]
+(defn summary [reg metric labels val]
   ;;TODO: when needed
   )
 
@@ -128,9 +118,8 @@
     (.append out (escape-help-comment help-message))
     (.append out "\n")))
 
-(defn serialize [ztx & [ns]]
-  (let [reg (:metrics @ztx)
-        ^StringBuilder out (StringBuilder.)
+(defn serialize [reg & [ns]]
+  (let [^StringBuilder out (StringBuilder.)
         registry (if ns (get @reg ns) @reg)]
     (doseq [[m ms] (:counter registry)]
       (help-line out registry m)
@@ -160,6 +149,3 @@
         (print-line out (str (name m) "_count") lbls cnt)
         (print-line out (str (name m) "_sum") lbls sum)))
     (.toString out)))
-
-;; exporters api
-(defmulti eval-exporter (fn [ztx sym metrics & [reg-name]] sym))

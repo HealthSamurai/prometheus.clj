@@ -1,2 +1,21 @@
 {:paths       ["src"]
- :deps        {org.clojure/clojure {:mvn/version "1.10.3"}}}
+ :deps        {org.clojure/clojure {:mvn/version "1.10.3"}}
+
+ :aliases {:nrepl {:extra-paths ["test"]
+                   :extra-deps  {refactor-nrepl/refactor-nrepl {:mvn/version "2.5.1"}
+                                 cider/cider-nrepl             {:mvn/version "LATEST"}
+                                 hashp/hashp                   {:mvn/version "0.2.1"}
+                                 healthsamurai/matcho          {:mvn/version "0.3.8"}
+                                 zprint/zprint                 {:mvn/version "1.1.2"}}
+
+                   :jvm-opts    ^:replace ["-XX:-OmitStackTraceInFastThrow"]}
+           :test
+           {:extra-deps  {org.clojure/test.check        {:mvn/version "1.1.0"}
+                          cider/cider-nrepl             {:mvn/version "LATEST"}
+                          healthsamurai/matcho          {:mvn/version "0.3.7"}
+                          lambdaisland/kaocha           {:mvn/version "1.0.861"}
+                          lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}}
+            :extra-paths ["test"]
+            :jvm-opts    []
+            :main-opts   ["--main" "kaocha.runner"]}}
+ }
