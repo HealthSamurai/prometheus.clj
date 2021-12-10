@@ -6,7 +6,7 @@
 
 
 (defn send-ztx [ztx & params]
-  (apply send (:box/metrics @ztx) params))
+  (apply send (:metrics @ztx) params))
 
 (defn set-counter
   ([ztx metric labels v]
@@ -34,25 +34,25 @@
 
 (defn get-metric
   ([ztx metric]
-   (let [reg (:box/metrics @ztx)]
+   (let [reg (:metrics @ztx)]
      (or
       (get-in @reg [:counter metric])
       (get-in @reg [:gauge metric])
       (get-in @reg [:histogram metric]))))
   ([ztx metric labels]
-   (let [reg (:box/metrics @ztx)]
+   (let [reg (:metrics @ztx)]
      (or
       (get-in @reg [:counter metric labels])
       (get-in @reg [:gauge metric labels])
       (get-in @reg [:histogram metric labels])))))
 
 (defn register-metric-meta [ztx metric meta-name value]
-  (let [reg (:box/metrics @ztx)]
+  (let [reg (:metrics @ztx)]
     (when-not (get-in @reg [:meta metric meta-name])
       (send reg assoc-in [:meta metric meta-name] value))))
 
 (defn register-metric-meta! [ztx metric meta-name value]
-  (let [reg (:box/metrics @ztx)]
+  (let [reg (:metrics @ztx)]
     (send reg assoc-in [:meta metric meta-name] value)))
 
 (def default-buckets [0.005 0.01 0.025 0.05 0.1 0.25 0.5 1.0 2.5 5.0 10])
@@ -68,7 +68,7 @@
 
 (defn histogram
   ([ztx metric labels val]
-   (when-let  [reg (some-> ztx deref :box/metrics)]
+   (when-let  [reg (some-> ztx deref :metrics)]
      (let [buckets (or (get-in @reg [:meta metric :buckets]) default-buckets)
            bnd (find-bound buckets val)]
        (send reg (fn [reg]
@@ -77,7 +77,7 @@
                        (update-in [:histogram metric labels :count] (fn [x] (inc (or x 0))))
                        (update-in [:histogram metric labels :sum] (fn [x] (+ (or x 0) val)))))))))
   ([ztx ns metric labels val]
-   (when-let  [reg (:box/metrics @ztx)]
+   (when-let  [reg (:metrics @ztx)]
      (let [buckets (or (get-in @reg [:meta metric :buckets]) default-buckets)
            bnd (find-bound buckets val)]
        (send reg (fn [reg]
@@ -129,7 +129,7 @@
     (.append out "\n")))
 
 (defn serialize [ztx & [ns]]
-  (let [reg (:box/metrics @ztx)
+  (let [reg (:metrics @ztx)
         ^StringBuilder out (StringBuilder.)
         registry (if ns (get @reg ns) @reg)]
     (doseq [[m ms] (:counter registry)]
