@@ -6,6 +6,11 @@
 
   (def reg-c (sut/new-registry))
 
+  (sut/reg-object reg-c :obj 1)
+
+  (t/is 
+   (= (sut/get-object reg-c :obj) 1))
+
   (sut/counter reg-c :my_counter {:box "aidbox"})
 
   (Thread/sleep 50)

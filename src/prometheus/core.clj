@@ -4,6 +4,12 @@
 (defn new-registry []
   (agent {}))
 
+(defn reg-object [reg key object]
+  (send reg assoc-in [:object key] object))
+
+(defn get-object [reg key]
+  (get-in @reg [:object key]))
+
 (defn set-counter
   ([reg metric labels v]
    (send reg assoc-in [:counter metric labels] v))
