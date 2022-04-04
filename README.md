@@ -1,6 +1,7 @@
 #  prometheus.clj
 
-Pure clojure, zero-deps prometheus client library
+Pure clojure, zero-deps prometheus client library.
+It's up to you create HTTP handler to serve metrics or use HTTP client for pushgateway!
 
 ```clj
 
