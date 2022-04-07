@@ -35,7 +35,8 @@
    (send reg assoc-in [ns :gauge metric labels] v)))
 
 (defn get-metric
-  ([reg metric] (or
+  ([reg metric]
+   (or
     (get-in @reg [:counter metric])
     (get-in @reg [:gauge metric])
     (get-in @reg [:histogram metric])))
