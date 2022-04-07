@@ -23,7 +23,7 @@
   (t/is (= (sut/get-metric reg-c :my_counter {:box "aidbox"}) 2))
 
   (t/is (= (sut/serialize reg-c)
-           "# TYPE my_counter counter\nmy_counter{box=\"aidbox\",} 2\n"))
+           "# TYPE my_counter counter\nmy_counter{box=\"aidbox\"} 2\n"))
 
   (sut/counter-add reg-c :my_counter {:box "aidbox"} 5)
 
@@ -33,7 +33,7 @@
   (sut/counter reg-c :minutes :slow_counter {:box "aidbox"})
   (Thread/sleep 50)
   (t/is (= (sut/serialize reg-c :minutes)
-           "# TYPE slow_counter counter\nslow_counter{box=\"aidbox\",} 1\n"))
+           "# TYPE slow_counter counter\nslow_counter{box=\"aidbox\"} 1\n"))
 
   (def reg-g (sut/new-registry))
   (sut/gauge reg-g :my_gauge {:box "aidbox"} 10.34)
@@ -48,7 +48,7 @@
 
   (Thread/sleep 50)
   (t/is (= (sut/serialize reg-g)
-           "# TYPE my_gauge gauge\nmy_gauge{box=\"aidbox\",} 7.85\n"))
+           "# TYPE my_gauge gauge\nmy_gauge{box=\"aidbox\"} 7.85\n"))
 
   (def reg-h (sut/new-registry))
   (sut/register-metric-meta reg-h :my_histogram :buckets [0 5 30 50 100 200 500 1000 2000 3000 10000 20000])
@@ -68,36 +68,36 @@
 
   (t/is (= (sut/serialize reg-h)
            "# TYPE my_histogram histogram
-my_histogram_bucket{label=\"aidbox\",le=\"0\",} 0
-my_histogram_bucket{label=\"aidbox\",le=\"5\",} 0
-my_histogram_bucket{label=\"aidbox\",le=\"30\",} 0
-my_histogram_bucket{label=\"aidbox\",le=\"50\",} 1
-my_histogram_bucket{label=\"aidbox\",le=\"100\",} 1
-my_histogram_bucket{label=\"aidbox\",le=\"200\",} 1
-my_histogram_bucket{label=\"aidbox\",le=\"500\",} 4
-my_histogram_bucket{label=\"aidbox\",le=\"1000\",} 4
-my_histogram_bucket{label=\"aidbox\",le=\"2000\",} 4
-my_histogram_bucket{label=\"aidbox\",le=\"3000\",} 4
-my_histogram_bucket{label=\"aidbox\",le=\"10000\",} 4
-my_histogram_bucket{label=\"aidbox\",le=\"20000\",} 5
-my_histogram_bucket{label=\"aidbox\",le=\"+Inf\",} 6
-my_histogram_count{label=\"aidbox\",} 6
-my_histogram_sum{label=\"aidbox\",} 112789
-my_histogram_bucket{label=\"other\",le=\"0\",} 0
-my_histogram_bucket{label=\"other\",le=\"5\",} 0
-my_histogram_bucket{label=\"other\",le=\"30\",} 0
-my_histogram_bucket{label=\"other\",le=\"50\",} 0
-my_histogram_bucket{label=\"other\",le=\"100\",} 0
-my_histogram_bucket{label=\"other\",le=\"200\",} 0
-my_histogram_bucket{label=\"other\",le=\"500\",} 0
-my_histogram_bucket{label=\"other\",le=\"1000\",} 0
-my_histogram_bucket{label=\"other\",le=\"2000\",} 0
-my_histogram_bucket{label=\"other\",le=\"3000\",} 0
-my_histogram_bucket{label=\"other\",le=\"10000\",} 0
-my_histogram_bucket{label=\"other\",le=\"20000\",} 1
-my_histogram_bucket{label=\"other\",le=\"+Inf\",} 2
-my_histogram_count{label=\"other\",} 2
-my_histogram_sum{label=\"other\",} 112000
+my_histogram_bucket{label=\"aidbox\",le=\"0\"} 0
+my_histogram_bucket{label=\"aidbox\",le=\"5\"} 0
+my_histogram_bucket{label=\"aidbox\",le=\"30\"} 0
+my_histogram_bucket{label=\"aidbox\",le=\"50\"} 1
+my_histogram_bucket{label=\"aidbox\",le=\"100\"} 1
+my_histogram_bucket{label=\"aidbox\",le=\"200\"} 1
+my_histogram_bucket{label=\"aidbox\",le=\"500\"} 4
+my_histogram_bucket{label=\"aidbox\",le=\"1000\"} 4
+my_histogram_bucket{label=\"aidbox\",le=\"2000\"} 4
+my_histogram_bucket{label=\"aidbox\",le=\"3000\"} 4
+my_histogram_bucket{label=\"aidbox\",le=\"10000\"} 4
+my_histogram_bucket{label=\"aidbox\",le=\"20000\"} 5
+my_histogram_bucket{label=\"aidbox\",le=\"+Inf\"} 6
+my_histogram_count{label=\"aidbox\"} 6
+my_histogram_sum{label=\"aidbox\"} 112789
+my_histogram_bucket{label=\"other\",le=\"0\"} 0
+my_histogram_bucket{label=\"other\",le=\"5\"} 0
+my_histogram_bucket{label=\"other\",le=\"30\"} 0
+my_histogram_bucket{label=\"other\",le=\"50\"} 0
+my_histogram_bucket{label=\"other\",le=\"100\"} 0
+my_histogram_bucket{label=\"other\",le=\"200\"} 0
+my_histogram_bucket{label=\"other\",le=\"500\"} 0
+my_histogram_bucket{label=\"other\",le=\"1000\"} 0
+my_histogram_bucket{label=\"other\",le=\"2000\"} 0
+my_histogram_bucket{label=\"other\",le=\"3000\"} 0
+my_histogram_bucket{label=\"other\",le=\"10000\"} 0
+my_histogram_bucket{label=\"other\",le=\"20000\"} 1
+my_histogram_bucket{label=\"other\",le=\"+Inf\"} 2
+my_histogram_count{label=\"other\"} 2
+my_histogram_sum{label=\"other\"} 112000
 "))
 
   )

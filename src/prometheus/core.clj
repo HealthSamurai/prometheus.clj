@@ -35,8 +35,7 @@
    (send reg assoc-in [ns :gauge metric labels] v)))
 
 (defn get-metric
-  ([reg metric]
-   (or
+  ([reg metric] (or
     (get-in @reg [:counter metric])
     (get-in @reg [:gauge metric])
     (get-in @reg [:histogram metric])))
@@ -99,15 +98,19 @@
         (str/replace "\"" "\\\""))
     "\"\""))
 
+
 (defn print-labels [^StringBuilder out lbls]
   (when-not (empty? lbls)
     (.append out "{")
-    (doseq [[k v] lbls]
-      (when v
+    (loop [[[k v :as l]  & rest] lbls]
+      (when l
         (.append out (name k))
         (.append out "=\"")
         (.append out (escape-label-value v))
-        (.append out "\",")))
+        (.append out "\"")
+        (when (seq rest)
+          (.append out ",")
+          (recur rest))))
     (.append out "}")))
 
 
