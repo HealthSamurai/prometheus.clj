@@ -1,5 +1,11 @@
 #  prometheus.clj
 
+```edn
+ prometheus/prometheus {:git/url "https://github.com/HealthSamurai/prometheus.cl"
+                        :sha "b29c4d6c88405bc04b5fe8fef0e0cadca759cd7b"}
+
+```
+
 Pure clojure, zero-deps prometheus client library.
 It's up to you create HTTP handler to serve metrics or use HTTP client for pushgateway!
 
