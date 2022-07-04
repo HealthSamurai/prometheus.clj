@@ -1,7 +1,7 @@
 #  prometheus.clj
 
 ```edn
- prometheus/prometheus {:git/url "https://github.com/HealthSamurai/prometheus.cl"
+ prometheus/prometheus {:git/url "https://github.com/HealthSamurai/prometheus.clj"
                         :sha "b29c4d6c88405bc04b5fe8fef0e0cadca759cd7b"}
 
 ```
