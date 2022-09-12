@@ -1,24 +1,9 @@
-{:deps  {}
- :tasks {:requires    ([babashka.fs :as fs])
-         ;; helpers and constants
-         :init        (println "init")
-         :enter       (do)
-         :leave       (do)
-         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-         ;; commands
-
-
+{:tasks {:requires    ([babashka.fs :as fs])
          repl         {:doc  "Run Clojure repl for Emacs with cider"
                        :task (clojure "-M:cider/nrepl")}
 
          outdated     {:doc  "Check for outdated dependencies"
-                       :task (clojure (str "-M:outdated " (apply str (interpose " " *command-line-args*))))}
-
-         bump         {:doc  "Bump version artifact in `project-version` file, level may be one of: major, minor, patch, alpha, beta, rc, release."
-                       :task (let [param (first *command-line-args*)
-                                   level (or (#{"major" "minor" "patch" "alpha" "beta" "rc" "release"} param) "patch")]
-                               (shell {:out version-file} (format "bb -f scripts/bump-semver.clj %s %s" version-id level))
-                               (println version-id "->" (clojure.string/trim (slurp version-file))))}
+                       :task (clojure "-Sdeps '{:deps {com.github.liquidz/antq {:mvn/version \"RELEASE\"}}}' -M -m antq.core")}
 
          test         {:doc  "Run tests"
                        :task (clojure (str "-M:test " (apply str (interpose " " *command-line-args*))))}
